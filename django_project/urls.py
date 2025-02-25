@@ -9,6 +9,8 @@ from myapp.views import (
     # GetPostsView,
     GetPostWithCommentsView,
     UpdatePostView,
+    DeletePostView,
+    DeleteCommentView,
 )
 
 
@@ -31,4 +33,6 @@ urlpatterns = [
         name="get_post_with_comments",
     ),
     path("posts/<int:pk>/update/", UpdatePostView.as_view(), name="update_post"),
+    path("posts/<int:pk>/delete/", DeletePostView.as_view(), name="delete_post"),
+    path("posts/<int:pk>/", DeleteCommentView.as_view(), name="delete_comment"),
 ]

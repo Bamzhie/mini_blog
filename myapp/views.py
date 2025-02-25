@@ -177,7 +177,7 @@ class UpdatePostView(APIView):
         except Post.DoesNotExist:
             return None
 
-    def put(self, request, pk):
+    def patch(self, request, pk):
         post = self.get_object(pk)
         if not post:
             return Response(
@@ -205,4 +205,52 @@ class UpdatePostView(APIView):
         return Response(
             bad_request_response(post_serializer.errors),
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class DeletePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response(
+                not_found_response("Post not found"), status=status.HTTP_404_NOT_FOUND
+            )
+
+        if post.author != request.user:
+            return Response(
+                unauthorized_response("You are not authorized to perform this action"),
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        post.delete()
+        return Response(
+            success_response(data=None, message="Post deleted successfully"),
+            status=status.HTTP_204_NO_CONTENT,
+        )
+
+
+class DeleteCommentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            comment = Comment.objects.get(pk=pk)
+        except Comment.DoesNotExist:
+            return Response(
+                not_found_response("Comment not found"),
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if comment.user != request.user:
+            return Response(
+                unauthorized_response("You are not authorized to perform this action"),
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        comment.delete()
+        return Response(
+            success_response(data=None, message="Comment deleted successfully"),
+            status=status.HTTP_204_NO_CONTENT,
         )
