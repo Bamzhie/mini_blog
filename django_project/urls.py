@@ -8,6 +8,7 @@ from myapp.views import (
     CommentOnPostView,
     # GetPostsView,
     GetPostWithCommentsView,
+    UpdatePostView,
 )
 
 
@@ -29,4 +30,5 @@ urlpatterns = [
         GetPostWithCommentsView.as_view(),
         name="get_post_with_comments",
     ),
+    path("posts/<int:pk>/update/", UpdatePostView.as_view(), name="update_post"),
 ]
