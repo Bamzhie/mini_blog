@@ -17,68 +17,21 @@ from .response_utils import (
 )
 
 
-class RegisterView(APIView):
-    def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            password = make_password(serializer.validated_data["password"])
-            user = serializer.save(password=password)
-
-            return Response(
-                success_response(
-                    serializer.data, message="Welcome! account created successfully"
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class LoginView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        user = CustomUser.objects.filter(email=email).first()
-
-        if not user:
-            return Response(
-                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        print(f"User found: {user.email}")
-
-        if user and user.check_password(password):
-            refresh = RefreshToken.for_user(user)
-
-            # Explicitly add user_id to the token
-            refresh["user_id"] = str(user.user_id)  # Convert UUID to string
-            data = {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            }
-            return Response(
-                success_response(data, message="Login successful"),
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
-            )
-
-
 class CreatePostView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print("Request Data:", request.data)
         # Initialize the serializer with the incoming request data and context
+
         post_serializer = PostSerializer(
             data=request.data, context={"request": request}
         )
-
         # Check if the data is valid according to the serializer's validation rules
+
         if post_serializer.is_valid():
             # Save the post instance with the current user as the author
-            post_serializer.save()
+            post_serializer.save(author=request.user)
 
             # Return a success response with the serialized data and a 201 Created status code
             return Response(
@@ -93,7 +46,7 @@ class CreatePostView(APIView):
         # If the data is not valid, return an error response with the serializer's errors and a 400 Bad Request status code
 
         return Response(
-            error_response(error_response(post_serializer.error_messages)),
+            error_response(post_serializer.error_messages),
             status=status.HTTP_400_BAD_REQUEST,
         )
 

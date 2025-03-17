@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
 )
 from django.utils.translation import gettext_lazy as _
 import uuid
+from cloudinary.models import CloudinaryField
 
 
 class CustomUserManager(BaseUserManager):
@@ -58,6 +59,15 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="images")
+    image = CloudinaryField(verbose_name="Image")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for post {self.post.title}"
 
 
 class Comment(models.Model):

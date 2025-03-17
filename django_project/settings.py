@@ -5,6 +5,7 @@ from datetime import timedelta
 from pathlib import Path
 from django.utils.module_loading import import_string
 
+import cloudinary
 
 env = environ.Env()
 environ.Env.read_env()
@@ -35,6 +36,8 @@ INSTALLED_APPS = [
     "myapp",
     "rest_framework",
     "rest_framework_simplejwt",
+    "cloudinary",
+    "cloudinary_storage",
 ]
 
 
@@ -100,6 +103,17 @@ SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "myapp.serializers.TokenSerializer",
 }
 
+# Cloudinary Configuration
+CLOUDINARY_CREDENTIALS = {
+    "cloud_name": os.getenv("CLOUD_NAME"),
+    "api_key": os.getenv("API_KEY"),
+    "api_secret": os.getenv("API_SECRET"),
+}
+
+
+cloudinary.config(**CLOUDINARY_CREDENTIALS)
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

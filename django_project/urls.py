@@ -2,8 +2,6 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 from myapp.views import (
-    RegisterView,
-    LoginView,
     CreatePostView,
     CommentOnPostView,
     # GetPostsView,
@@ -11,6 +9,11 @@ from myapp.views import (
     UpdatePostView,
     DeletePostView,
     DeleteCommentView,
+)
+
+from myapp.auth import (
+    RegisterView,
+    LoginView,
 )
 
 
